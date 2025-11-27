@@ -89,8 +89,8 @@ The application consists of:
 ### Verification
 
 - Backend API endpoints:
-  - `POST http://localhost:8000/api/tasks/analyze/` - Analyze all tasks
-  - `POST http://localhost:8000/api/tasks/suggest/` - Get top 3 suggestions
+  - `POST http://localhost:8000/api/analyze/` - Analyze all tasks
+  - `POST http://localhost:8000/api/suggest/` - Get top 3 suggestions
 - Frontend should load at `http://localhost:8080` with a clean interface ready to accept tasks
 
 ---
@@ -240,12 +240,6 @@ This ensures the dependency graph stays valid.
 - **Decision**: Custom event system for inter-component communication
 - **Trade-off**: Reinventing the wheel
 - **Rationale**: Decouples components without adding dependencies
-
----
-
-## Cycle Detection
-The cycle detection algorithm uses Depth-First Search (DFS) to identify circular dependencies among tasks.
-- Tells the user exactly which tasks are involved in the cycle for easy debugging and show the cycle path.
 
 ---
 
