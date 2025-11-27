@@ -1,5 +1,113 @@
-import { bus } from "../core/eventbus.js";
+import { API } from "../services/api.js";
+import { Render } from "./render.js";
+
+// State
+let taskList = [];
 
 export function initializeApp() {
-  console.log("✅ App Initialized");
+  console.log("✅ Logic Initialized");
+  setupTabs();
+  setupForm();
+  setupActions();
+
+  // Global helper for the "Remove" button in HTML string
+  window.removeTask = (id) => {
+    taskList = taskList.filter((t) => t.id !== id);
+    Render.stagingArea(taskList);
+  };
+}
+
+function setupTabs() {
+  const tabs = document.querySelectorAll(".nav-link");
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", (e) => {
+      e.preventDefault();
+      // Active Class Toggle
+      tabs.forEach((t) => t.classList.remove("active"));
+      e.target.closest(".nav-link").classList.add("active");
+
+      // Form Visibility Toggle
+      const targetId = e.target.closest(".nav-link").dataset.target;
+      document.getElementById("form-single").classList.add("d-none");
+      document.getElementById("form-bulk").classList.add("d-none");
+      document.getElementById(targetId).classList.remove("d-none");
+    });
+  });
+}
+
+function setupForm() {
+  document.getElementById("form-single").addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const rawDate = document.getElementById("inp-date").value;
+    const rawDeps = document.getElementById("inp-deps").value;
+
+    const newTask = {
+      id: Date.now(),
+      title: document.getElementById("inp-title").value,
+
+      // If rawDate is empty string "", this becomes undefined.
+      // JSON.stringify() removes undefined keys, so the backend receives nothing.
+      due_date: rawDate || undefined,
+
+      estimated_hours:
+        parseFloat(document.getElementById("inp-hours").value) || 1,
+      importance: parseInt(document.getElementById("inp-imp").value) || 5,
+
+      dependencies: rawDeps
+        ? rawDeps
+            .split(",")
+            .map((n) => parseInt(n.trim()))
+            .filter((n) => !isNaN(n))
+        : [],
+    };
+
+    taskList.push(newTask);
+    Render.stagingArea(taskList);
+
+    // Reset Form
+    e.target.reset();
+    document.getElementById("inp-imp").value = 5;
+  });
+}
+
+function setupActions() {
+  // Helper to merge Single List + Bulk JSON
+  const getPayload = () => {
+    const bulkVal = document.getElementById("inp-json").value;
+    let bulkTasks = [];
+    try {
+      if (bulkVal) bulkTasks = JSON.parse(bulkVal);
+    } catch (e) {
+      alert("Invalid JSON");
+      return null;
+    }
+    return [...taskList, ...bulkTasks];
+  };
+
+  const runAnalysis = async (isSuggest) => {
+    const payload = getPayload();
+    if (!payload || payload.length === 0) return alert("Add tasks first!");
+
+    Render.toggleState("slot-loading");
+
+    try {
+      const strategy = document.getElementById("strategy-select").value;
+      const data = isSuggest
+        ? await API.suggest(payload)
+        : await API.analyze(payload, strategy);
+
+      Render.results(data, isSuggest);
+      Render.toggleState("slot-results");
+    } catch (err) {
+      Render.showError(err.message);
+    }
+  };
+
+  document
+    .getElementById("btn-analyze")
+    .addEventListener("click", () => runAnalysis(false));
+  document
+    .getElementById("btn-suggest")
+    .addEventListener("click", () => runAnalysis(true));
 }
