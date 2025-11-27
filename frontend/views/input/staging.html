@@ -1,0 +1,33 @@
+<div class="card shadow-sm border-0 bg-white">
+  <div
+    class="card-header bg-white border-bottom-0 pt-3 pb-0 d-flex justify-content-between align-items-center"
+  >
+    <h6 class="fw-bold text-uppercase text-muted mb-0">Staging Area</h6>
+    <span class="badge bg-secondary rounded-pill" id="staging-count">0</span>
+  </div>
+
+  <div class="card-body p-0">
+    <ul
+      id="staging-list"
+      class="list-group list-group-flush scroll-area px-2 py-2"
+    >
+      <li class="list-group-item text-center text-muted border-0 py-4">
+        <small>No tasks added yet.</small>
+      </li>
+    </ul>
+  </div>
+
+  <div class="card-footer bg-white border-top-0 p-3">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <button id="btn-analyze" class="btn btn-dark flex-grow-1">
+        Analyze All
+      </button>
+      <button
+        id="btn-suggest"
+        class="btn btn-warning text-white fw-bold flex-grow-1"
+      >
+        Suggest Top 3
+      </button>
+    </div>
+  </div>
+</div>

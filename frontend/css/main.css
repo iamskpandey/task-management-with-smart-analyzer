@@ -1,0 +1,10 @@
+@import url("components/base.css");
+@import url("components/cards.css");
+@import url("components/animations.css");
+
+.cursor-pointer {
+  cursor: pointer;
+}
+.min-h-500 {
+  min-height: 500px;
+}

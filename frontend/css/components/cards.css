@@ -1,0 +1,26 @@
+.card-hover:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.border-left-lg {
+  border-left-width: 6px !important;
+}
+
+.priority-high {
+  border-left-color: #dc3545 !important;
+}
+
+.priority-med {
+  border-left-color: #fd7e14 !important;
+}
+
+.priority-low {
+  border-left-color: #198754 !important;
+}
+
+.suggestion-mode .priority-high {
+  box-shadow: 0 0 15px rgba(220, 53, 69, 0.4) !important;
+  border: 2px solid #dc3545;
+}

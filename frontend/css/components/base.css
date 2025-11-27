@@ -1,0 +1,13 @@
+:root {
+  --brand-primary: #0d6efd;
+  --brand-gold: #d97706;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.scroll-area {
+  max-height: 300px;
+  overflow-y: auto;
+}
