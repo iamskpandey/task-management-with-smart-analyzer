@@ -1,5 +1,6 @@
 import { API } from "../services/api.js";
 import { Render } from "./render.js";
+import { bus } from "../core/eventbus.js";
 
 // State
 let taskList = [];
@@ -9,12 +10,23 @@ export function initializeApp() {
   setupTabs();
   setupForm();
   setupActions();
+  setupEventWiring();
 
   // Global helper for the "Remove" button in HTML string
   window.removeTask = (id) => {
     taskList = taskList.filter((t) => t.id !== id);
-    Render.stagingArea(taskList);
+    bus.emit("state:updated", taskList);
   };
+}
+
+function setupEventWiring() {
+  bus.on("state:updated", (tasks) => Render.stagingArea(tasks));
+  bus.on("ui:loading", () => Render.toggleState("slot-loading"));
+  bus.on("ui:success", ({ data, isSuggest }) => {
+    Render.results(data, isSuggest);
+    Render.toggleState("slot-results");
+  });
+  bus.on("ui:error", (msg) => Render.showError(msg));
 }
 
 function setupTabs() {
@@ -63,7 +75,7 @@ function setupForm() {
     };
 
     taskList.push(newTask);
-    Render.stagingArea(taskList);
+    bus.emit("state:updated", taskList);
 
     // Reset Form
     e.target.reset();
@@ -89,7 +101,7 @@ function setupActions() {
     const payload = getPayload();
     if (!payload || payload.length === 0) return alert("Add tasks first!");
 
-    Render.toggleState("slot-loading");
+    bus.emit("ui:loading");
 
     try {
       const strategy = document.getElementById("strategy-select").value;
@@ -97,10 +109,9 @@ function setupActions() {
         ? await API.suggest(payload)
         : await API.analyze(payload, strategy);
 
-      Render.results(data, isSuggest);
-      Render.toggleState("slot-results");
+      bus.emit("ui:success", { data, isSuggest });
     } catch (err) {
-      Render.showError(err.message);
+      bus.emit("ui:error", err.message);
     }
   };
 
