@@ -81,6 +81,40 @@ function setupForm() {
     e.target.reset();
     document.getElementById("inp-imp").value = 5;
   });
+
+  const btnLoad = document.getElementById("btn-load-json");
+  if (btnLoad) {
+    btnLoad.addEventListener("click", () => {
+      const jsonInput = document.getElementById("inp-json");
+      const rawValue = jsonInput.value.trim();
+
+      if (!rawValue) return alert("Please paste some JSON first!");
+
+      try {
+        const parsed = JSON.parse(rawValue);
+        if (!Array.isArray(parsed))
+          throw new Error("JSON must be an array [...]");
+
+        const newTasks = parsed.map((t, index) => ({
+          id: Date.now() + index,
+          title: t.title || "Untitled Task",
+          due_date: t.due_date || undefined,
+          estimated_hours: parseFloat(t.estimated_hours) || 1,
+          importance: parseInt(t.importance) || 5,
+          dependencies: Array.isArray(t.dependencies) ? t.dependencies : [],
+        }));
+
+        taskList.push(...newTasks);
+
+        // Update UI
+        bus.emit("state:updated", taskList);
+
+        jsonInput.value = "";
+      } catch (err) {
+        alert("Invalid JSON: " + err.message);
+      }
+    });
+  }
 }
 
 function setupActions() {
